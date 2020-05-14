@@ -1,5 +1,6 @@
-FROM ubuntu:xenial
+FROM ubuntu:20.04
 
+# install basic packages
 RUN apt-get update -q && \
     apt-get install -qy \
         texlive-full \
@@ -9,6 +10,9 @@ RUN apt-get update -q && \
         git \
     && rm -rf /var/lib/apt/lists/*
 
+# customise environment
+ENV HOME /data
 WORKDIR /data
+
 VOLUME ["/data"]
 

@@ -17,7 +17,7 @@ wget -nv "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz"
 wget -nv "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512"
 wget -nv "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512.asc"
 
-gpg --import /texlive_pgp_keys.asc
+gpg --import /texlive.asc
 gpg --verify ./install-tl-unx.tar.gz.sha512.asc
 sha512sum -c ./install-tl-unx.tar.gz.sha512
 

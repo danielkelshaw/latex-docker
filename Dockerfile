@@ -12,7 +12,7 @@ RUN apt-get update -q && \
 # copy requisite scripts
 COPY setup.sh \
      texlive.profile \
-     texlive_pgp_keys.asc \
+     texlive.asc \
      /
 
 # run the setup script

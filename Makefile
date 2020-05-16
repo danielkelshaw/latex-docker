@@ -1,10 +1,15 @@
-IMAGE=latex
+AUTHOR=danielkelshaw
+REPO=latex
+IMAGE=$(AUTHOR)/$(REPO)
+
+.PHONY: build_all
+build_all: full basic
+
+.PHONY: full
+full: Dockerfile
+	@docker build --build-arg scheme=full -t $(IMAGE):full .
 
 .PHONY: basic
-basic: Dockerfile.basic
-	@docker build -f Dockerfile.basic -t $(IMAGE):basic .
-
-.PHONY: ubuntu
-ubuntu: Dockerfile.ubuntu
-	@docker build -f Dockerfile.ubuntu -t $(IMAGE):ubuntu .
+basic: Dockerfile
+	@docker build --build-arg scheme=basic -t $(IMAGE):basic .
 

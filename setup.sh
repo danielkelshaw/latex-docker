@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 SCHEME="$1"
 
 if ! [[ "$SCHEME" =~ ^(full|medium|small|basic|minimal|teTeX|ConTeXt)$ ]]; then
-    echo "$SCHEME" is not a valid scheme.i
+    echo "$SCHEME" is not a valid scheme
     exit 1
 fi
 

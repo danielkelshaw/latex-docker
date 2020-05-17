@@ -15,11 +15,11 @@ COPY setup.sh \
      texlive.asc \
      /
 
+# add texlive to path
+ENV PATH="/opt/texlive/texdir/bin/x86_64-linux:${PATH}"
+
 # run the setup script
 RUN /setup.sh ${scheme}
-
-# add texlive to path
-ENV PATH="/usr/local/texlive/2020/bin/x86_64-linux:${PATH}"
 
 # customise environment
 ENV HOME /data

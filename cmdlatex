@@ -1,0 +1,3 @@
+IMAGE=danielkelshaw/latex:full
+exec docker run --rm -i -v `pwd`:/data $IMAGE $@
+

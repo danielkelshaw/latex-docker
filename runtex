@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+
+get_filepath() {
+    echo $(cd $(dirname $1); pwd)/$(basename $1)
+}
+
+last_modified() {
+    echo $(stat -f%c $1)
+}
+
+compile() {
+    cmdlatex latexmk -pdf $1
+    cmdlatex latexmk -c
+}
+
+filepath=$(get_filepath $1)
+filename=$(basename $filepath)
+
+EDIT_T=$(last_modified $filepath)
+
+if [[ ! -f $filepath ]] || [[ ! $filepath == *.tex ]]; then
+    echo "Must be vaild .tex file..."
+    exit 1
+fi
+
+echo "Starting LaTeX Server..."
+cd $(dirname $filepath)
+
+while true; do
+    CURR_EDIT_T=$(last_modified $filepath)
+    if [[ $EDIT_T -ne $CURR_EDIT_T ]]; then
+        EDIT_T=$CURR_EDIT_T
+        echo "Updating .tex"
+        compile $filename
+    fi
+done

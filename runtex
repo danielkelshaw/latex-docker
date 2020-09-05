@@ -2,6 +2,11 @@
 
 set -e
 
+
+IMAGE=danielkelshaw/latex:full
+CONTAINER_NAME="runtex"
+
+
 get_filepath() {
     echo $(cd $(dirname $1); pwd)/$(basename $1)
 }
@@ -10,29 +15,100 @@ last_modified() {
     echo $(stat -f%c $1)
 }
 
-compile() {
-    cmdlatex latexmk -pdf $1
-    cmdlatex latexmk -c
+etime() {
+    echo "[$(date +%H:%M:%S)] $1"
 }
 
-filepath=$(get_filepath $1)
-filename=$(basename $filepath)
+start_container() {
 
-EDIT_T=$(last_modified $filepath)
+    if [ ! $(docker ps -q -f name=$CONTAINER_NAME) ]; then
+        docker run --rm -i -d --name $CONTAINER_NAME -v $1:/data $IMAGE &>/dev/null
+        etime "Container running."
+    else
+        etime "Container already running..."
+    fi
 
-if [[ ! -f $filepath ]] || [[ ! $filepath == *.tex ]]; then
-    echo "Must be vaild .tex file..."
+}
+
+stop_container() {
+
+    if [ ! $(docker ps -q -f name=$CONTAINER_NAME) ]; then
+        etime "Container not running."
+    else
+        docker kill $CONTAINER_NAME &>/dev/null
+    fi
+
+}
+
+tidy_container() {
+
+    if [ $(docker ps -aq -f status=exited -f name=$CONTAINER_NAME) ]; then
+        etime "Tidying up container..."
+        docker rm $CONTAINER_NAME &>/dev/null
+    fi
+
+}
+
+compile() {
+    
+    if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
+        etime "Compiling..."
+        docker exec $CONTAINER_NAME latexmk -pdf $1 &>/dev/null
+        etime "Done compiling..."
+    else
+        etime "Container not running..."
+        exit 1
+    fi
+
+}
+
+clean() {
+
+    if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
+        docker exec $CONTAINER_NAME latexmk -c &>/dev/null
+    else
+        etime "Container not running..."
+        exit 1
+    fi
+
+}
+
+terminate() {
+    tidy_container
+    stop_container
+
+    echo
+    etime "Server Stopped."
+    
+    exit
+}
+
+
+FILEPATH=$(get_filepath $1)
+FILENAME=$(basename $FILEPATH)
+
+EDIT_T=$(last_modified $FILEPATH)
+
+if [[ ! -f $FILEPATH ]] || [[ ! $FILEPATH == *.tex ]]; then
+    etime "Must be vaild .tex file..."
     exit 1
 fi
 
-echo "Starting LaTeX Server..."
-cd $(dirname $filepath)
+echo "Starting LaTeX Server."
 
+tidy_container
+start_container $(dirname $FILEPATH)
+
+trap terminate SIGINT
 while true; do
-    CURR_EDIT_T=$(last_modified $filepath)
+
+    CURR_EDIT_T=$(last_modified $FILEPATH)
     if [[ $EDIT_T -ne $CURR_EDIT_T ]]; then
         EDIT_T=$CURR_EDIT_T
-        echo "Updating .tex"
-        compile $filename
+        etime "Updating .tex"
+        
+        compile $FILENAME
+        clean
     fi
+
 done

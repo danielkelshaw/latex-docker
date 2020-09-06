@@ -21,7 +21,7 @@ make full
 
 ### **Compiling Tex:**
 
-First you will want to add `cmdlatex` to your path:
+First you will want to add `cmdlatex` / `runtex` to your path:
 
 ```bash
 echo "export PATH=\$PATH:$(pwd)" >> ~/.zshrc
@@ -30,7 +30,7 @@ echo "export PATH=\$PATH:$(pwd)" >> ~/.zshrc
 Now you can use `cmdlatex` to build your `.tex` files:
 
 ```bash
-cmdlatex <latex_command>
+cmdlatex [--dir <dir>] <latex_command>
 ```
 
 For example:
@@ -40,6 +40,12 @@ cmdlatex pdflatex main.tex
 ```
 
 This will generate all of the usual files in the current working directory.
+
+Alternatively you can run the `runtex` 'server' to monitor a given `.tex` file for changes and compile the `.pdf`:
+
+```bash
+runtex /path/to/file.tex
+```
 
 ### **Note:**
 
